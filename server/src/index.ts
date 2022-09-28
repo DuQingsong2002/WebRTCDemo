@@ -25,20 +25,28 @@ wss.on('connection', (ws, req) => {
             })
         
             sendAll({
-                type: 'server-msg',
+                type: 'join',
+                username,
                 data: `${username}加入聊天!, 当前在线人数: ${onlineUsers.length}`
             })
         
             ws.on('message', (msg) => {
-        
-                sendAll(JSON.parse(msg.toString()), username as string)
+
+                const data = JSON.parse(msg.toString())
+                
+                if(data.target) {
+                    sendToUser(username as string, data.target, data)
+                }else {
+                    sendAll(JSON.parse(msg.toString()), username as string)
+                }
             })
 
             ws.on('close', () => {
                 
                 onlineUsers.splice(onlineUsers.findIndex(item => item.username === username), 1)
                 sendAll({
-                    type: 'server-msg',
+                    type: 'leaved',
+                    username,
                     data: `${username}退出了聊天!, 当前在线人数: ${onlineUsers.length}`
                 })
             })
@@ -71,6 +79,12 @@ function sendAll(data: Object, sendUser?: string) {
             ws.send(JSON.stringify({...data, username: sendUser}))
         // }
     })
+}
+
+function sendToUser(sendUser: string, target: string, data: Object) {
+
+    const wsObj = findOnlineByUsername(target)
+    wsObj?.ws.send(JSON.stringify({username: sendUser, ...data}))
 }
 
 function findOnlineByUsername(username: string) {

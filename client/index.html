@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,29 +9,35 @@
     <link rel="stylesheet" href="./css/main.css">
 
 </head>
+
 <body>
     <main>
-        
+
         <h1>Web RTC Demo</h1>
-        <input type="text" placeholder="昵称" id="username" /> 
-        <input type="text" placeholder="群组" id="group-id" /> <button id="into-chat">加入or创建聊天</button>
+        <input type="text" placeholder="昵称" id="username" /><button id="into-chat">加入聊天</button>
 
-        <section id="chat-panel" class="chat-panel scroll">
-            
-            <!-- <section class="chat-msg">
-                
-                <div class="chat-msg__face">头像</div>
-                <div class="chat-msg__body ng">
-                    <h6 class="chat-msg__body__user">11</h6>
-                    <p class="chat-msg__body__content ng"></p>
-                </di>
-            </section> -->
+        <section style="display: flex;flex-wrap: wrap;">
+            <section id="chat-panel" class="chat-panel scroll card">
 
+                <!-- <section class="chat-msg">
+                    
+                    <div class="chat-msg__face">头像</div>
+                    <div class="chat-msg__body ng">
+                        <h6 class="chat-msg__body__user">11</h6>
+                        <p class="chat-msg__body__content ng"></p>
+                    </di>
+                </section> -->
+    
+            </section>
+            <section class="card" >
+                <video id="play-video" width="1280" height="600" autoplay></video>
+            </section>
         </section>
 
-        <input type="text" id="message-input" placeholder="消息内容" /> <button id="send-btn">发送</button>
+        <input type="text" id="message-input" placeholder="消息内容" /> <button id="send-btn">发送</button> <button id="send-rtc-btn">RTC连接</button>
     </main>
 
     <script src="./js/main.js" type="module"></script>
 </body>
+
 </html>

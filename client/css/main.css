@@ -16,3 +16,15 @@
  overflow: hidden;
  overflow-y: auto;   
 }
+
+.card {
+    
+    background-color: #efefef;
+
+    padding: 8px;
+    margin: 10px;
+}
+
+.user-list {
+    width: 200px;
+}

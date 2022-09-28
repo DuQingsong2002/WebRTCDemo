@@ -1,7 +1,8 @@
-import { getSocket } from "./socket.js"
+import { getSocket, sendToServer } from "./socket.js"
+import { handleNewICECandidateMsg, handleVideoAnswerMsg, handleVideoOfferMsg, invite, peerConnection } from "./video.js"
 
 const chatPanel = document.getElementById('chat-panel')
-const groupId = document.getElementById('group-id')
+const sendRtcBtn = document.getElementById('send-rtc-btn')
 const username = document.getElementById('username')
 const intoChat = document.getElementById('into-chat')
 const messageInput = document.getElementById('message-input')
@@ -32,6 +33,15 @@ intoChat.onclick = function() {
     username.readOnly = true
 }
 
+sendRtcBtn.onclick = function() {
+
+    sendToServer({
+        type: 'conn-rtc',
+        username: authUsername
+    })
+
+}
+
 sendBtn.onclick = function() {
 
     if(!socket) {
@@ -41,10 +51,10 @@ sendBtn.onclick = function() {
     if(!messageInput.value) {
         return alert('消息内容不能为空!')
     }
-    socket.send(JSON.stringify({
+    sendToServer({
         type: 'chat-msg',
         data: messageInput.value
-    }))
+    })
 
     messageInput.value = ''
 
@@ -57,11 +67,37 @@ function handleSocket(socket) {
     
         const data = JSON.parse(e.data)
         switch(data.type) {
-            case 'server-msg':
+            case 'join':
+                chatPanel.appendChild(createMsgPop(data, 'server'))
+                break
+            case 'leaved':
                 chatPanel.appendChild(createMsgPop(data, 'server'))
                 break
             case 'chat-msg':
                 chatPanel.appendChild(createMsgPop(data, authUsername === data.username ? 'me' : ''))
+                break
+            case 'conn-rtc':
+                const dom = createMsgPop({data: data.username + '发起音视频通话，点击加入!'}, 'server')
+
+                if(authUsername !== data.username) {
+                    dom.onclick = function() {
+                        invite(data.username)
+                    }
+                }
+
+                chatPanel.appendChild(dom)
+                break
+            case 'video-offer':
+                // offerRTC(data.username)
+                handleVideoOfferMsg(data)
+                break
+            case 'video-answer':
+                // answerRTC(data.username, data.sdp)
+                handleVideoAnswerMsg(data)
+                break
+            case 'new-ice-candidate':
+                // answerRTC(data.username, data.sdp)
+                handleNewICECandidateMsg(data)
                 break
         }
     }
@@ -76,7 +112,7 @@ const createMsgPop = function(data, type) {
 
     chat.innerHTML = (`<!--div class="chat-msg__face">头像</！div-->
     <div class="chat-msg__body ng">
-        ${data.username ? `<h6 class="chat-msg__body__user">${data.username}</h6>` : ''}
+        ${data.type === 'chat-msg' ? `<h6 class="chat-msg__body__user">${data.username}</h6>` : ''}
         <p class="chat-msg__body__content ng">${data.data}</p>
     </di>`)
 
